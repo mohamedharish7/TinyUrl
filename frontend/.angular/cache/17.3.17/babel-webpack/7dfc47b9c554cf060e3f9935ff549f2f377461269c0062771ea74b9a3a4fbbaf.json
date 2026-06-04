@@ -1,0 +1,1 @@
+{"ast":null,"code":"export const environment = {\n  production: true,\n  apiUrl: 'https://YOUR-AZURE-APP.azurewebsites.net' // Replace after Azure deploy\n};","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

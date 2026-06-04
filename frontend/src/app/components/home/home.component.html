@@ -1,0 +1,84 @@
+<div class="page-wrapper">
+  <header class="header">
+    <h1 class="logo">Tiny URL</h1>
+  </header>
+
+  <form class="card generator-card" [formGroup]="urlForm" (ngSubmit)="generateUrl()">
+    <div class="input-row">
+      <input
+        type="url"
+        formControlName="originalUrl"
+        placeholder="Enter full URL to shorten"
+        class="url-input"
+      />
+      <label class="private-toggle">
+        <input type="checkbox" formControlName="isPrivate" />
+        <span>Private</span>
+      </label>
+    </div>
+
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="isLoading"
+    >
+      {{ isLoading ? 'Generating...' : 'Generate' }}
+    </button>
+
+    <div *ngIf="successMsg" class="alert alert-success">{{ successMsg }}</div>
+    <div *ngIf="errorMsg" class="alert alert-error">{{ errorMsg }}</div>
+  </form>
+
+  <section class="card list-card">
+    <div class="list-header">
+      <h2>Public URLs</h2>
+      <input
+        type="text"
+        [formControl]="searchControl"
+        placeholder="Search URLs..."
+        class="search-input"
+      />
+    </div>
+
+    <div *ngIf="filteredUrls.length === 0" class="empty-state">
+      <p>No public URLs found.</p>
+    </div>
+
+    <div class="url-list">
+      <div *ngFor="let url of filteredUrls" class="url-item">
+        <div class="url-info">
+          <a
+            [href]="url.shortUrl"
+            target="_blank"
+            rel="noopener"
+            class="short-url"
+            (click)="trackUrlClick(url)"
+          >
+            {{ url.shortUrl }}
+          </a>
+          <span class="original-url" [title]="url.originalUrl">
+            {{ url.originalUrl | slice:0:60 }}{{ url.originalUrl.length > 60 ? '...' : '' }}
+          </span>
+        </div>
+
+        <button
+          class="btn btn-sm btn-copy"
+          (click)="copyToClipboard(url.shortUrl, url.shortCode)"
+        >
+          {{ copiedCode === url.shortCode ? 'Copied!' : 'Copy' }}
+        </button>
+
+        <span class="clicks-badge">
+          {{ url.hitCount }} click{{ url.hitCount !== 1 ? 's' : '' }}
+        </span>
+
+        <button
+          class="btn btn-sm btn-delete"
+          (click)="deleteUrl(url.shortCode)"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </section>
+</div>
