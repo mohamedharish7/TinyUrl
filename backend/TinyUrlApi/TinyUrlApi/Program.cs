@@ -10,7 +10,7 @@ builder.Services.AddCors(options =>
         policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
-// Services
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -19,7 +19,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Auto-create DB on startup
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -30,7 +30,7 @@ app.UseCors();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// ─── Helper: Generate 6-char short code ───────────────────────────────────────
+
 static string GenerateShortCode()
 {
     const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -38,7 +38,7 @@ static string GenerateShortCode()
     return new string(Enumerable.Range(0, 6).Select(_ => chars[random.Next(chars.Length)]).ToArray());
 }
 
-// ─── POST /api/shorten ─────────────────────────────────────────────────────────
+
 app.MapPost("/api/shorten", async (ShortenRequest request, AppDbContext db, HttpContext http) =>
 {
     if (string.IsNullOrWhiteSpace(request.OriginalUrl) || !Uri.IsWellFormedUriString(request.OriginalUrl, UriKind.Absolute))
@@ -75,8 +75,7 @@ app.MapPost("/api/shorten", async (ShortenRequest request, AppDbContext db, Http
 .WithTags("URLs")
 .WithOpenApi();
 
-// ─── GET /api/urls ─────────────────────────────────────────────────────────────
-// Returns only public shortened URLs
+
 app.MapGet("/api/urls", async (AppDbContext db, HttpContext http) =>
 {
     var baseUrl = $"{http.Request.Scheme}://{http.Request.Host}";
@@ -99,8 +98,7 @@ app.MapGet("/api/urls", async (AppDbContext db, HttpContext http) =>
 .WithTags("URLs")
 .WithOpenApi();
 
-// ─── GET /api/urls/{shortCode} ─────────────────────────────────────────────────
-// Returns details of a specific short URL
+
 app.MapGet("/api/urls/{shortCode}", async (string shortCode, AppDbContext db, HttpContext http) =>
 {
     var entry = await db.UrlEntries.FirstOrDefaultAsync(u => u.ShortCode == shortCode);
@@ -122,7 +120,7 @@ app.MapGet("/api/urls/{shortCode}", async (string shortCode, AppDbContext db, Ht
 .WithTags("URLs")
 .WithOpenApi();
 
-// ─── DELETE /api/urls/{shortCode} ──────────────────────────────────────────────
+
 app.MapDelete("/api/urls/{shortCode}", async (string shortCode, AppDbContext db) =>
 {
     var entry = await db.UrlEntries.FirstOrDefaultAsync(u => u.ShortCode == shortCode);
@@ -136,8 +134,7 @@ app.MapDelete("/api/urls/{shortCode}", async (string shortCode, AppDbContext db)
 .WithTags("URLs")
 .WithOpenApi();
 
-// ─── GET /{shortCode} ──────────────────────────────────────────────────────────
-// Redirect to original URL (hit counter increment)
+
 app.MapGet("/{shortCode}", async (string shortCode, AppDbContext db) =>
 {
     var entry = await db.UrlEntries.FirstOrDefaultAsync(u => u.ShortCode == shortCode);
@@ -154,5 +151,5 @@ app.MapGet("/{shortCode}", async (string shortCode, AppDbContext db) =>
 
 app.Run();
 
-// ─── Request DTO ───────────────────────────────────────────────────────────────
+
 record ShortenRequest(string OriginalUrl, bool IsPrivate = false);
