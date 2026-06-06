@@ -45,7 +45,7 @@ export class HomeComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading URLs', err);
-        this.errorMsg = 'Could not load URLs. Make sure the API is running on http://localhost:5000.';
+        this.errorMsg = 'Could not load URLs. Please check that the live API is reachable.';
       }
     });
   }

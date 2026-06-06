@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://YOUR-AZURE-APP.azurewebsites.net'  // Replace after Azure deploy
+  apiUrl: 'https://tinyurl-api-dvh7emgkfwbnccb7.australiaeast-01.azurewebsites.net'
 };

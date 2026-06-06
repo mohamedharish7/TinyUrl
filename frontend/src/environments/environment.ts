@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5000'   // Backend local dev URL
+  apiUrl: 'https://tinyurl-api-dvh7emgkfwbnccb7.australiaeast-01.azurewebsites.net'
 };
