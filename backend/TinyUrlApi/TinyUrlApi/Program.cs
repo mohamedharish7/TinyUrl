@@ -7,30 +7,39 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
-        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+        policy.WithOrigins(
+                "https://victorious-hill-033b1130f.7.azurestaticapps.net",
+                "http://localhost:4200")
+              .AllowAnyMethod()
+              .AllowAnyHeader());
 });
 
-
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    var connStr = builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+    options.UseSqlServer(connStr);
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddApplicationInsightsTelemetry();
+
+var appInsightsConnStr = builder.Configuration["ApplicationInsights:ConnectionString"];
+if (!string.IsNullOrEmpty(appInsightsConnStr))
+    builder.Services.AddApplicationInsightsTelemetry(o => o.ConnectionString = appInsightsConnStr);
 
 var app = builder.Build();
-
 
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
+    try { db.Database.EnsureCreated(); }
+    catch (Exception ex) { Console.WriteLine($"DB init skipped: {ex.Message}"); }
 }
 
 app.UseCors();
 app.UseSwagger();
 app.UseSwaggerUI();
-
 
 static string GenerateShortCode()
 {
@@ -39,6 +48,10 @@ static string GenerateShortCode()
     return new string(Enumerable.Range(0, 6).Select(_ => chars[random.Next(chars.Length)]).ToArray());
 }
 
+app.MapGet("/api/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }))
+.WithName("HealthCheck")
+.WithTags("Health")
+.WithOpenApi();
 
 app.MapPost("/api/shorten", async (ShortenRequest request, AppDbContext db, HttpContext http) =>
 {
@@ -76,7 +89,6 @@ app.MapPost("/api/shorten", async (ShortenRequest request, AppDbContext db, Http
 .WithTags("URLs")
 .WithOpenApi();
 
-
 app.MapGet("/api/urls", async (AppDbContext db, HttpContext http) =>
 {
     var baseUrl = $"{http.Request.Scheme}://{http.Request.Host}";
@@ -99,7 +111,6 @@ app.MapGet("/api/urls", async (AppDbContext db, HttpContext http) =>
 .WithTags("URLs")
 .WithOpenApi();
 
-
 app.MapGet("/api/urls/{shortCode}", async (string shortCode, AppDbContext db, HttpContext http) =>
 {
     var entry = await db.UrlEntries.FirstOrDefaultAsync(u => u.ShortCode == shortCode);
@@ -121,7 +132,6 @@ app.MapGet("/api/urls/{shortCode}", async (string shortCode, AppDbContext db, Ht
 .WithTags("URLs")
 .WithOpenApi();
 
-
 app.MapDelete("/api/urls/{shortCode}", async (string shortCode, AppDbContext db) =>
 {
     var entry = await db.UrlEntries.FirstOrDefaultAsync(u => u.ShortCode == shortCode);
@@ -134,7 +144,6 @@ app.MapDelete("/api/urls/{shortCode}", async (string shortCode, AppDbContext db)
 .WithName("DeleteUrl")
 .WithTags("URLs")
 .WithOpenApi();
-
 
 app.MapGet("/{shortCode}", async (string shortCode, AppDbContext db) =>
 {
@@ -151,6 +160,5 @@ app.MapGet("/{shortCode}", async (string shortCode, AppDbContext db) =>
 .WithOpenApi();
 
 app.Run();
-
 
 record ShortenRequest(string OriginalUrl, bool IsPrivate = false);
