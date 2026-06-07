@@ -50,10 +50,10 @@ tinyurl-project/
 
 ### Setup & Run
 
-1. Update the connection string in `backend/TinyUrlApi/TinyUrlApi/appsettings.json`:
+1. Connection string is already configured to point to Azure SQL Database in `backend/TinyUrlApi/TinyUrlApi/appsettings.json`:
    ```json
    "ConnectionStrings": {
-     "DefaultConnection": "Data Source=<SERVER>\\SQLEXPRESS;Initial Catalog=TinyUrl;Integrated Security=True;TrustServerCertificate=True;"
+     "DefaultConnection": "Server=tcp:tinyurl-server.database.windows.net,1433;Initial Catalog=TinyUrl;Persist Security Info=False;User ID=<user>;Password=<password>;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
    }
    ```
 
