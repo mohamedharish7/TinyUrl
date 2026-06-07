@@ -4,6 +4,28 @@ A full-stack URL shortener built with **Angular 17** (frontend) and **ASP.NET Co
 
 ---
 
+## Live URLs
+
+| Resource | URL |
+|----------|-----|
+| Frontend App | https://victorious-hill-033b1130f.7.azurestaticapps.net |
+| Backend API | https://tinyurl-api-dvh7emgkfwbnccb7.australiaeast-01.azurewebsites.net |
+| Swagger UI | https://tinyurl-api-dvh7emgkfwbnccb7.australiaeast-01.azurewebsites.net/swagger |
+
+
+---
+
+## Local URLs
+
+| Resource | URL |
+|----------|-----|
+| Frontend App | http://localhost:4200 |
+| Backend API | http://localhost:5000 |
+| Swagger UI | http://localhost:5000/swagger |
+
+
+---
+
 ## Project Structure
 
 ```
