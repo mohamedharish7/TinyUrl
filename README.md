@@ -37,6 +37,27 @@ tinyurl-project/
 
 ---
 
+## Database — Azure SQL
+
+- **Server**: `tinyurl-server.database.windows.net`
+- **Database**: `TinyUrl`
+- **ORM**: Entity Framework Core 8 with `UseSqlServer()`
+- Tables are auto-created on first run via `EnsureCreated()`
+- Schema is defined in `AppDbContext.cs`
+
+### UrlEntries Table
+
+| Column | Type | Description |
+|--------|------|-------------|
+| Id | int | Primary key |
+| ShortCode | string | Unique 6-char code |
+| OriginalUrl | string | Full original URL |
+| CreatedAt | datetime | Creation timestamp |
+| HitCount | int | Number of redirects |
+| IsPrivate | bool | Hidden from public list |
+
+---
+
 ## Backend — ASP.NET Core 8
 
 ### Tech Stack
