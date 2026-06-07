@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
-        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+         policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
 
@@ -16,7 +16,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddApplicationInsightsTelemetry();
+
+var appInsightsConnStr = builder.Configuration["ApplicationInsights:ConnectionString"];
+if (!string.IsNullOrEmpty(appInsightsConnStr))
+    builder.Services.AddApplicationInsightsTelemetry(options =>
+        options.ConnectionString = appInsightsConnStr);
 
 var app = builder.Build();
 
@@ -148,6 +152,11 @@ app.MapGet("/{shortCode}", async (string shortCode, AppDbContext db) =>
 })
 .WithName("RedirectToUrl")
 .WithTags("Redirect")
+.WithOpenApi();
+
+app.MapGet("/api/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }))
+.WithName("HealthCheck")
+.WithTags("Health")
 .WithOpenApi();
 
 app.Run();
