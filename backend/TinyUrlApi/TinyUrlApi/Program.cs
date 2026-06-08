@@ -48,10 +48,7 @@ static string GenerateShortCode()
     return new string(Enumerable.Range(0, 6).Select(_ => chars[random.Next(chars.Length)]).ToArray());
 }
 
-app.MapGet("/api/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }))
-.WithName("HealthCheck")
-.WithTags("Health")
-.WithOpenApi();
+
 
 app.MapPost("/api/shorten", async (ShortenRequest request, AppDbContext db, HttpContext http) =>
 {
